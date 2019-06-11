@@ -1,5 +1,7 @@
 #include "List.h"
 #include <iostream>
+#include <random>
+#include <ctime>
 
 void List::Serialize(FILE* file)
 {
@@ -21,6 +23,8 @@ void List::PushHead(std::string newData)
 		newNode->next = head;
 	}
 	head = newNode;
+	count++;
+
 	head->rand = GetRandomListNode();
 
 	if (oldHead == nullptr)
@@ -28,7 +32,6 @@ void List::PushHead(std::string newData)
 		tail = head;
 	}
 
-	count++;
 }
 
 void List::PopHead()
@@ -37,11 +40,15 @@ void List::PopHead()
 	{
 		if (head != tail) {
 			head->next->prev = head->prev;
+			auto oldHead = head;
 			head = head->next;
+			delete oldHead;
+			oldHead = nullptr;
 		} else
 		{
-			tail->prev = nullptr;
-			head = tail;
+			delete head;
+			head = nullptr;
+			tail = nullptr;
 		}
 
 		count--;
@@ -60,6 +67,7 @@ void List::PushTail(std::string newData)
 		newNode->prev = tail;
 	}
 	tail = newNode;
+	count++;
 	tail->rand = GetRandomListNode();
 
 	if (oldTail == nullptr)
@@ -67,7 +75,6 @@ void List::PushTail(std::string newData)
 		head = tail;
 	}
 
-	count++;
 }
 
 void List::PopTail()
@@ -76,12 +83,16 @@ void List::PopTail()
 	{
 		if (head != tail) {
 			tail->prev->next = tail->next;
+			auto oldTail = tail;
 			tail = tail->prev;
+			delete oldTail;
+			oldTail = nullptr;
 		}
 		else
 		{
-			head->next = nullptr;
-			tail = head;
+			delete head;
+			head = nullptr;
+			tail = nullptr;
 		}
 
 		count--;
@@ -98,9 +109,39 @@ void List::PrintList()
 	}
 }
 
+void List::CheckTail()
+{
+	if (tail->rand == nullptr)
+	{
+		std::cout << "NULL" << std::endl;
+	} 
+	else
+	{
+		std::cout << tail->rand->data << std::endl;
+	}
+}
+
 ListNode* List::GetRandomListNode()
 {
+	if (count > 0) 
+	{
+		std::default_random_engine generator(time(0));
+		std::uniform_int_distribution<int> distribution(0, count);
+		int dice_roll = distribution(generator);
 
+		std::cout << dice_roll << " ";
+		if (dice_roll == count)
+			return nullptr;
+
+		int index = 0;
+		ListNode* rand = head;
+		while (index < dice_roll)
+		{
+			rand = rand->next;
+			index++;
+		}
+		return rand;
+	}
 
 	return nullptr;
 }

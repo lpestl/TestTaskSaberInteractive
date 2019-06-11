@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <map>
+#include <vector>
 
 struct ListNode {
 	ListNode* prev;
@@ -23,6 +25,8 @@ class List
 		void PopTail();
 
 		void PrintList();
+		void CheckTail();
+
 	private:
 		ListNode* GetRandomListNode();
 

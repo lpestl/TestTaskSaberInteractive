@@ -14,6 +14,17 @@ int main()
 
 	list->PrintList();
 
+	list->PopHead();
+	list->PopHead();
+
+	list->PrintList();
+	list->CheckTail();
+
+	list->PopHead();
+	list->PopHead();
+
+	list->PrintList();
+
 	delete list;
 
 	return 0;
