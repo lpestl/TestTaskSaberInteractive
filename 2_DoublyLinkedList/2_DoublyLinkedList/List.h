@@ -25,10 +25,10 @@ class List
 		void PopTail();
 
 		void PrintList();
-		void CheckTail();
 
+		void UpdateRandomPointers();
 	private:
-		ListNode* GetRandomListNode();
+		ListNode* GetRandomListNode(int dice_roll);
 
 		ListNode* head;
 		ListNode* tail;

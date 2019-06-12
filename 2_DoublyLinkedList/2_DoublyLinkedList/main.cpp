@@ -3,27 +3,19 @@
 
 int main()
 {
+	// Test
 	List* list = new List();
-
-	list->PrintList();
-
+	// Init nodes
 	list->PushHead("First in");
 	list->PushHead("Second in");
 	list->PushHead("Some data");
 	list->PushTail("I am a tail");
-
+	// Update random pointers for all nodes
+	list->UpdateRandomPointers();
+	// Print list
+	std::cout << "List before Serialization:" << std::endl;
 	list->PrintList();
 
-	list->PopHead();
-	list->PopHead();
-
-	list->PrintList();
-	list->CheckTail();
-
-	list->PopHead();
-	list->PopHead();
-
-	list->PrintList();
 
 	delete list;
 
