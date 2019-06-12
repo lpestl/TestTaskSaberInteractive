@@ -2,13 +2,68 @@
 #include <iostream>
 #include <random>
 #include <ctime>
+#include <map>
 
 void List::Serialize(FILE* file)
 {
+	// For serialization, we write down all the nodes from head to tail.
+	auto currentNode = head;
+	while (currentNode != nullptr)
+	{
+		// Write the address in the memory of the node and the address of the rand pointer into the file,
+		// and then write the data from the new line
+		// The newline character ('\n') will mean the end of the data.
+		fprintf(file, "%u %u\n%s\n", 
+			reinterpret_cast<std::uintptr_t>(currentNode), 
+			reinterpret_cast<std::uintptr_t>(currentNode->rand), 
+			currentNode->data.c_str());
+		currentNode = currentNode->next;
+	}
 }
 
 void List::Deserialize(FILE* file)
 {
+	// To restore the structure, we will use the map, where the key will be the old address in memory
+	std::map<std::uintptr_t, ListNode*> nodesMap;
+	// Add nullptr key
+	nodesMap[reinterpret_cast<std::uintptr_t>(nullptr)] = nullptr;
+
+	// Variables for reading from the file the old address (as the key for map) and the old address rand pointer (as the key)
+	std::uintptr_t keyNode, randKey;
+	// In the vector, we will store the keys for the pointer by rand in the order from the head to the tail.
+	std::vector<std::uintptr_t> randKeysOrder;
+	// We read the keys first (old addresses in memory)
+	while (fscanf_s(file, "%u %u\n", &keyNode, &randKey) != EOF)
+	{
+		// We will literally read the data and save to the buffer
+		char bufferChar, buffer[256];
+		int cursoreLineIndex = 0;
+		// We read one character until we meet the transfer to a new line.
+		while ((bufferChar = fgetc(file)) != '\n' )
+		{
+			buffer[cursoreLineIndex] = bufferChar;
+			cursoreLineIndex++;
+		}
+		// Mark the end of the line with the \0 character so that the buffer is correctly translated into std::string
+		buffer[cursoreLineIndex] = '\0';
+		// Add the read data to the tail of the list so that the order is restored to the correct one.
+		// At the same time, the prev and next pointers will be restored correctly, indicating the necessary nodes.
+		PushTail(buffer);
+		// Write the new pointer just added to the map using the old key
+		nodesMap[keyNode] = tail;
+		// And remember his old address for rand pointer
+		randKeysOrder.push_back(randKey);
+	}
+
+	// Now we will restore all the pointers to rand from the map in the order they follow.
+	auto currNode = head;
+	int keyOrderIndex = 0;
+	while (currNode != nullptr)
+	{
+		currNode->rand = nodesMap[randKeysOrder[keyOrderIndex]];
+		currNode = currNode->next;
+		keyOrderIndex++;
+	}
 }
 
 void List::PushHead(std::string newData)
